@@ -33,6 +33,9 @@
       .handle svg { width: 0.75em; height: 0.75em; flex-shrink: 0; }
       .slide-opening { --slide-gap: clamp(24px, 4vh, 48px); --slide-padding-y: clamp(32px, 5vh, 72px); padding-block: var(--slide-padding-y); }
       .slide-opening .handle { font-size: clamp(20px, 2.2vw, 32px); }
+      .slide-question-reminder { --slide-gap: clamp(24px, 4vh, 48px); }
+      .slide-question-reminder h1 { max-width: 18em; font-size: clamp(32px, 4.5vw, 64px); }
+      .slide-question-reminder .qr { width: min(300px, 34svh, 60vw); }
       .talk-title { margin: 0; max-width: 1400px; font-size: clamp(40px, 6.2vw, 96px); font-weight: 400; line-height: 1.04; letter-spacing: -0.04em; text-align: center; text-wrap: balance; }
       .handle .speaker-avatar { width: clamp(32px, 3vw, 44px); height: auto; aspect-ratio: 1; object-fit: cover; border-radius: 50%; }
       .questions { display: flex; align-items: center; gap: clamp(32px, 5vw, 80px); }
@@ -984,9 +987,10 @@
         <a class="skills-link" href="https://github.com/lucasmeijer/lucas-skills/tree/main/skills/lplan" target="_blank" rel="noopener noreferrer">github.com/lucasmeijer/lucas-skills</a>
               </div>
       </section>
-      <section id="slide-22" class="slide slide-statement" aria-label="Questions reminder">
+      <section id="slide-22" class="slide slide-statement slide-question-reminder" aria-label="Questions reminder">
         <div class="slide-content">
         <h1>Lucas, dont forget to look at the questions</h1>
+          <img class="qr" src="assets/questions-qr.png" width="700" height="700" alt="Scan to ask a question during the session">
               </div>
       </section>
       <section id="slide-23" class="slide slide-diagram" aria-label="A person reviews the coding machine output">
@@ -1130,9 +1134,10 @@
         </div>
               </div>
       </section>
-      <section id="slide-34" class="slide slide-statement" aria-label="Questions reminder">
+      <section id="slide-34" class="slide slide-statement slide-question-reminder" aria-label="Questions reminder">
         <div class="slide-content">
         <h1>Lucas, dont forget to look at the questions</h1>
+          <img class="qr" src="assets/questions-qr.png" width="700" height="700" alt="Scan to ask a question during the session">
               </div>
       </section>
       <section id="slide-35" class="slide slide-diagram" aria-label="Parallel coding tasks" data-controller="build" data-action="click->build#next" data-build-descriptions-value='["One coding machine connects the two people", "Two coding machines work in parallel", "Three coding machines work in parallel"]'>
