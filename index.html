@@ -1,0 +1,1247 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Lucas Meijer — Workshop</title>
+    <style>
+      * { box-sizing: border-box; }
+      html, body { margin: 0; background: #101010; color: #fff; }
+      html { scroll-behavior: auto; }
+      body { font-family: Arial, Helvetica, sans-serif; }
+      .slide {
+        min-height: 100svh;
+        padding: clamp(32px, 7vw, 112px);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: clamp(48px, 9vh, 96px);
+      }
+      .handle {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35em;
+        color: inherit;
+        text-decoration: none;
+        font-size: clamp(40px, 6vw, 88px);
+        font-weight: 400;
+        letter-spacing: -0.045em;
+      }
+      .handle svg { width: 0.75em; height: 0.75em; flex-shrink: 0; }
+      .slide-opening { gap: clamp(24px, 4vh, 48px); padding-block: clamp(32px, 5vh, 72px); }
+      .slide-opening .handle { font-size: clamp(20px, 2.2vw, 32px); }
+      .talk-title { margin: 0; max-width: 1400px; font-size: clamp(40px, 6.2vw, 96px); font-weight: 400; line-height: 1.04; letter-spacing: -0.04em; text-align: center; text-wrap: balance; }
+      .handle .speaker-avatar { width: clamp(32px, 3vw, 44px); height: auto; aspect-ratio: 1; object-fit: cover; border-radius: 50%; }
+      .questions { display: flex; align-items: center; gap: clamp(32px, 5vw, 80px); }
+      .questions p {
+        font-size: clamp(26px, 3.1vw, 48px);
+        line-height: 1.2;
+        letter-spacing: -0.025em;
+        max-width: 12em;
+        margin: 0;
+        text-wrap: balance;
+      }
+      .qr {
+        display: block;
+        width: clamp(220px, 27vw, 380px);
+        height: auto;
+        padding: 20px;
+        background: white;
+        image-rendering: pixelated;
+      }
+      a:focus-visible { outline: 2px solid white; outline-offset: 12px; }
+      .slide-photo { padding: 0; height: 100svh; background: #000; }
+      .slide-photo img { display: block; width: 100%; height: 100%; object-fit: contain; }
+      .slide-prompt { align-items: flex-start; gap: clamp(28px, 5vh, 56px); }
+      .slide-prompt h1 { margin: 0; font: 400 clamp(44px, 6vw, 88px)/1 monospace; letter-spacing: -0.05em; }
+      .prompt-text { max-width: 1100px; font-size: clamp(20px, 2.5vw, 36px); line-height: 1.35; letter-spacing: -0.02em; }
+      .prompt-text p { margin: 0 0 0.75em; }
+      .prompt-text p:last-child { margin-bottom: 0; }
+      .prompt-text ul { margin: 0; padding-left: 1.15em; }
+      .prompt-text li { padding-left: 0.15em; margin-top: 0.25em; }
+      .slide-word h1 { margin: 0; font: 400 clamp(72px, 14vw, 200px)/1 monospace; letter-spacing: -0.06em; }
+      .additions { color: #4ade80; }
+      .deletions { color: #f87171; }
+      .slide-statement h1 { margin: 0; max-width: 16em; font-size: clamp(40px, 7vw, 104px); font-weight: 400; line-height: 1.15; letter-spacing: -0.04em; text-align: center; text-wrap: balance; }
+      [hidden] { display: none !important; }
+      .slide-diagram { padding: clamp(16px, 4vw, 64px); }
+      .diagram { width: 100%; max-width: 1600px; max-height: 85svh; background: white; }
+      img.diagram { height: auto; object-fit: contain; }
+      .option-art { position: relative; width: 100%; max-width: 1600px; container-type: inline-size; }
+      .closing-logo { position: relative; width: min(100%, 1000px); aspect-ratio: 1200 / 630; }
+      .closing-logo img { position: absolute; inset: 0; width: 100%; height: 100%; }
+      .closing-url { color: white; text-decoration: none; font-size: clamp(28px, 4.5vw, 64px); letter-spacing: -0.035em; }
+      .slide-video video { display: block; width: 100%; max-width: 1600px; max-height: 85svh; }
+      .option-art img { display: block; }
+      .option-number {
+        position: absolute;
+        left: var(--option-x, 5%);
+        top: var(--option-y, 8%);
+        font: 400 var(--option-size, 9cqw)/1 Arial, sans-serif;
+        color: black;
+        pointer-events: none;
+      }
+      .slide-service { position: relative; }
+      .slide-service:not([data-build-step="0"]) .service-art {
+        position: absolute;
+        top: clamp(16px, 4vw, 64px);
+        left: clamp(16px, 4vw, 64px);
+        width: calc((100% - clamp(32px, 8vw, 128px)) / 5);
+        max-width: 320px;
+      }
+      .service-points {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 80%;
+        max-width: 1100px;
+        margin: 0;
+        padding-left: 1.2em;
+        font-size: clamp(28px, 4vw, 64px);
+        line-height: 1.3;
+        letter-spacing: -0.025em;
+      }
+      .service-points li { margin: 0.65em 0; padding-left: 0.15em; }
+      .service-points li[hidden] { display: list-item !important; visibility: hidden; }
+      .slide-bullets { position: relative; }
+      .review-tweet { display: grid; grid-template-columns: 48px 1fr; gap: 12px; padding: 20px; background: #191c22; color: #f1f3f5; border: 1px solid #454a55; border-radius: 14px; line-height: 1.4; box-shadow: 0 8px 24px #0008; }
+      .review-tweet a { color: inherit; text-decoration: none; }
+      .review-tweet a:hover { text-decoration: underline; }
+      .review-avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
+      .review-tweet header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; margin-bottom: 10px; }
+      .review-name { font-weight: 700; }
+      .review-handle, .review-time { color: #9da5b4 !important; font-size: 0.7em; }
+      .review-text { margin: 0; overflow-wrap: anywhere; }
+      .review-text a { color: #9bcaff; }
+      .review-tweet footer { display: flex; gap: 12px; align-items: center; margin-top: 18px; color: #9da5b4; font-size: 0.65em; }
+      .review-open { margin-left: auto; }
+      .review-single .review-tweet { width: 100%; max-width: 1050px; font-size: clamp(18px, 2.25vw, 34px); padding: clamp(20px, 3vw, 44px); }
+      .review-pile-slide { padding: clamp(12px, 2vw, 32px); overflow: hidden; }
+      .review-pile { position: relative; width: 100%; max-width: 1600px; aspect-ratio: 16 / 9; max-height: 90svh; container-type: inline-size; }
+      .review-pile-card { position: absolute; left: var(--tweet-x); top: var(--tweet-y); width: 29%; transform: rotate(var(--tweet-angle)); }
+      .review-pile .review-tweet { grid-template-columns: 2.6cqw 1fr; gap: 0.65cqw; padding: 1cqw; border-radius: 0.8cqw; font-size: 1.05cqw; }
+      .review-pile .review-avatar { width: 2.6cqw; height: 2.6cqw; }
+      .review-pile .review-tweet header { gap: 0 0.4cqw; margin-bottom: 0.4cqw; }
+      .review-pile .review-tweet footer { margin-top: 0.6cqw; gap: 0.5cqw; }
+      .shoutout-title { margin: 0; font-size: clamp(34px, 5vw, 76px); font-weight: 400; letter-spacing: -0.035em; text-align: center; }
+      .shoutout-author { display: flex; align-items: center; gap: 24px; color: white; text-decoration: none; font-size: clamp(26px, 3vw, 44px); }
+      .shoutout-author img { width: clamp(72px, 10vw, 140px); height: auto; aspect-ratio: 1; object-fit: cover; border-radius: 50%; }
+      .shoutout-author small { display: block; color: #aaa; font-size: 0.65em; margin-top: 6px; }
+      .testing-prompt { width: 100%; max-width: 1200px; }
+      .prompt-sentence { margin: 0 0 0.5em; color: #888; font-size: clamp(15px, 1.7vw, 24px); line-height: 1.3; letter-spacing: -0.015em; }
+      .prompt-sentence:last-child { margin-bottom: 0; }
+      .prompt-sentence:not([hidden]):not(:has(~ .prompt-sentence:not([hidden]))) { color: white; font-size: clamp(26px, 3.6vw, 52px); }
+      .simplify-buildup[data-build-step="6"] .testing-prompt .prompt-sentence { color: white; font-size: clamp(22px, 2.7vw, 40px); }
+      .testing-prompt code { font: inherit; overflow-wrap: anywhere; }
+
+      .slide-testing-flow:not([data-build-step="0"]) .testing-original-scene { transform: translate(380px, 150px) scale(0.75); }
+      .slide-testing-flow[data-build-step="2"] .testing-idea,
+      .slide-testing-flow[data-build-step="3"] .testing-idea { display: none; }
+      .arrow-hover { cursor: default; outline: none; }
+      .arrow-emphasis { display: none; pointer-events: none; }
+      .arrow-hover:hover .arrow-emphasis,
+      .arrow-hover:focus .arrow-emphasis { display: block; }
+      .arrow-tooltip { display: none; pointer-events: none; }
+      .arrow-hover:hover .arrow-tooltip,
+      .arrow-hover:focus .arrow-tooltip { display: block; }
+      .arrow-tooltip rect { fill: #101010; stroke: white; stroke-width: 3; }
+      .arrow-tooltip text { fill: white; font: 400 120px Arial, sans-serif; text-anchor: middle; dominant-baseline: middle; }
+      .busy-machine { transform-origin: 840px 820px; }
+      .printing-machine { display: none; pointer-events: none; }
+      [data-build-step="3"] .idle-machine { display: none; }
+      [data-build-step="3"] .printing-machine { display: block; }
+      [data-build-step="3"] .printing-frames { animation: machine-printing 1.6s steps(1) infinite; }
+      [data-build-step="3"] .busy-machine { animation: machine-working 220ms linear infinite; }
+      @keyframes machine-printing {
+        0% { transform: translate(0, 0); }
+        25% { transform: translate(-627px, 0); }
+        50% { transform: translate(0, -627px); }
+        75% { transform: translate(-627px, -627px); }
+      }
+      @keyframes machine-working {
+        0%, 100% { transform: translate(0, 0) rotate(0); }
+        25% { transform: translate(-5px, -3px) rotate(-0.6deg); }
+        50% { transform: translate(4px, 0) rotate(0.5deg); }
+        75% { transform: translate(-3px, -2px) rotate(-0.3deg); }
+      }
+      .skills-link { color: #bbb; font-size: clamp(18px, 2.5vw, 36px); text-underline-offset: 0.2em; max-width: 100%; overflow-wrap: anywhere; text-align: center; }
+      @media (max-width: 640px) {
+        .slide { gap: 40px; }
+        .questions { flex-direction: column; text-align: center; gap: 28px; }
+        .qr { width: min(68vw, 300px); }
+      }
+      @media print {
+        @page { size: landscape; margin: 0; }
+        .slide { height: 100vh; break-after: page; print-color-adjust: exact; }
+      }
+      .slide { position: relative; height: 100svh; }
+      .slide-content {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: inherit;
+        justify-content: inherit;
+        align-items: inherit;
+        gap: inherit;
+        padding: inherit;
+        transform: translateY(calc(-1 * var(--presentation-top-shift, 0svh))) scale(var(--presentation-scale, 1));
+        clip-path: inset(var(--presentation-top-cut, 0%) 0 0 0);
+        transform-origin: center top;
+      }
+      .presenter-controls {
+        position: fixed;
+        z-index: 100;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 20px;
+        border: 1px solid #555;
+        border-radius: 12px;
+        background: #202020;
+        box-shadow: 0 4px 24px #0008;
+        color: white;
+        font-size: 16px;
+        white-space: nowrap;
+      }
+      .presenter-controls input { width: clamp(100px, 25vw, 320px); accent-color: white; }
+      .presenter-controls output { min-width: 3ch; text-align: right; }
+      .presentation-frame {
+        position: fixed;
+        z-index: 90;
+        top: 0;
+        left: var(--presentation-frame-side, 0vw);
+        right: var(--presentation-frame-side, 0vw);
+        bottom: var(--presentation-frame-bottom, 0svh);
+        border: 4px solid #ff2bd6;
+        pointer-events: none;
+      }
+      @media print { .presenter-controls { display: none !important; } }
+    </style>
+  </head>
+  <body data-controller="presenter" data-action="keydown@window->presenter#keydown keyup@window->presenter#keyup blur@window->presenter#hide">
+    <main data-controller="deck" data-action="keydown@window->deck#keydown wheel@window->deck#wheel:!passive">
+      <section id="slide-1" class="slide slide-opening" aria-label="Workshop questions">
+        <div class="slide-content">
+        <h1 class="talk-title">Forget AGI. You're Surrounded by Low-Hanging Fruit</h1>
+        <a class="handle" href="https://x.com/lucasmeijer" aria-label="Lucas Meijer on X">
+          <img class="speaker-avatar" src="assets/lucas-avatar.png" width="88" height="88" alt="Lucas Meijer">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.64 7.584H.47l8.6-9.835L0 1.154h7.594l5.243 6.932 6.064-6.933ZM17.61 20.644h2.039L6.486 3.24H4.298L17.61 20.644Z"/>
+          </svg>
+          <span>@lucasmeijer</span>
+        </a>
+        <div class="questions">
+          <p>Use this QR to ask questions during the session</p>
+          <img class="qr" src="assets/questions-qr.png" width="700" height="700" alt="Scan this QR code to ask questions during the session">
+        </div>
+              </div>
+      </section>
+      <section id="slide-2" class="slide" aria-label="Talk title">
+        <div class="slide-content">
+        <h1 class="talk-title">Forget AGI. You're Surrounded by Low-Hanging Fruit</h1>
+              </div>
+      </section>
+      <section id="slide-3" class="slide slide-photo" aria-label="Architecture astronauts coordinating agent swarms">
+        <div class="slide-content">
+          <img src="assets/astronaut-concepts/editorial-architecture.png" width="1774" height="887" alt="Astronaut architects coordinate swarms of machines assembling an elaborate orbital computing structure">
+        </div>
+      </section>
+      <section id="slide-4" class="slide slide-statement" aria-label="Only solve the problems you actually have">
+        <div class="slide-content">
+          <h1>Only solve the problems you actually have</h1>
+        </div>
+      </section>
+      <section id="slide-5" class="slide" aria-label="Blank slide">
+        <div class="slide-content">        </div>
+      </section>
+      <section id="slide-6" class="slide slide-photo" aria-label="You live like this meme">
+        <div class="slide-content">
+        <img src="assets/you-live-like-this-edited.png" width="1829" height="860" alt="Max looking at Roxanne in a living room covered in rubbish, saying: Damn, you live like this?">
+              </div>
+      </section>
+      <section id="slide-7" class="slide slide-statement" aria-label="Dont single-shot a final solution">
+        <div class="slide-content">
+        <h1>Dont single-shot a final solution</h1>
+              </div>
+      </section>
+      <section id="slide-8" class="slide slide-prompt simplify-buildup" aria-label="Simplify prompt" data-controller="build" data-action="click->build#next" data-build-descriptions-value="[&quot;Review your complete body of work.&quot;, &quot;Identify missed opportunities for simplicity, and apply them.&quot;, &quot;Reuse code that makes sense to be shared.&quot;, &quot;Remove code that is now dead.&quot;, &quot;Find leftovers from previous attempts.&quot;, &quot;Find shortcuts you took, and do them properly.&quot;, &quot;The complete simplify prompt&quot;]">
+        <div class="slide-content">
+        <div class="testing-prompt">
+          <h1 style="margin-bottom: 0.6em">/simplify</h1>
+          <div data-build-target="diagram" role="group" aria-label="Review your complete body of work.">
+            <p class="prompt-sentence">Review your complete body of work.</p>
+            <p class="prompt-sentence" data-build-target="stage" hidden>Identify missed opportunities for simplicity, and apply them.</p>
+            <p class="prompt-sentence" data-build-target="stage" hidden>Reuse code that makes sense to be shared.</p>
+            <p class="prompt-sentence" data-build-target="stage" hidden>Remove code that is now dead.</p>
+            <p class="prompt-sentence" data-build-target="stage" hidden>Find leftovers from previous attempts.</p>
+            <p class="prompt-sentence" data-build-target="stage" hidden>Find shortcuts you took, and do them properly.</p>
+            <span data-build-target="stage" hidden aria-hidden="true"></span>
+          </div>
+        </div>
+              </div>
+      </section>
+      <section id="slide-9" class="slide slide-word" aria-label="28 additions, 3 deletions">
+        <div class="slide-content">
+        <h1><span class="additions">+28</span> <span class="deletions">-3</span></h1>
+              </div>
+      </section>
+      <section id="slide-10" class="slide slide-word" aria-label="Review">
+        <div class="slide-content">
+        <h1>/review</h1>
+              </div>
+      </section>
+      <section id="slide-11" class="slide review-single" aria-label="Lucas asks about agentic review workflows">
+        <div class="slide-content">
+<article class="review-tweet review-featured">
+  <a class="review-avatar-link" href="https://x.com/lucasmeijer" target="_blank" rel="noopener"><img class="review-avatar" src="assets/review-tweets/acb5c5e9a290.png" alt=""></a>
+  <div class="review-body">
+    <header>
+      <a class="review-name" href="https://x.com/lucasmeijer" target="_blank" rel="noopener">Lucas Meijer</a>
+      <a class="review-handle" href="https://x.com/lucasmeijer" target="_blank" rel="noopener">@lucasmeijer</a>
+      <a class="review-time" href="https://x.com/i/status/2112972459032870921" target="_blank" rel="noopener">Oct 21, 2026, 11:21 AM PDT</a>
+    </header>
+    <p class="review-text">Who is very happy with their agentic review workflow?<br><br>Do you have an agent try to prove/refute every item the review agent brought up?<br><br>Something more complicated, something more simple?<br><br>Multiple rounds until comments = 0?</p>
+    <footer>
+      <span class="review-metrics"><span>24 likes</span> · <span>18 replies</span> · <span>34 bookmarks</span></span>
+      <a class="review-open" href="https://x.com/i/status/2112972459032870921" target="_blank" rel="noopener">Open on X</a>
+    </footer>
+  </div>
+</article>
+              </div>
+      </section>
+      <section id="slide-12" class="slide review-pile-slide" aria-label="32 replies about agentic review workflows">
+        <div class="slide-content">
+        <div class="review-pile">
+          <div class="review-pile-card" style="--tweet-x: 1%; --tweet-y: 2.0%; --tweet-angle: -7deg;">
+<article class="review-tweet">
+  <a class="review-avatar-link" href="https://x.com/tbskspr" target="_blank" rel="noopener"><img class="review-avatar" src="assets/review-tweets/bf8b006128c5.jpg" alt=""></a>
+  <div class="review-body">
+    <header>
+      <a class="review-name" href="https://x.com/tbskspr" target="_blank" rel="noopener">Tobias Kasper</a>
+      <a class="review-handle" href="https://x.com/tbskspr" target="_blank" rel="noopener">@tbskspr</a>
+      <a class="review-time" href="https://x.com/i/status/2112993879108808980" target="_blank" rel="noopener">Oct 21, 2026, 12:46 PM PDT</a>
+    </header>
+    <p class="review-text">I am also interested in that.<br>To open the floor: I start review in a separate session and tell the main agent to only fix important findings. Not very happy with that but good enough.</p>
+    <footer>
+      <span class="review-metrics"><span>1 like</span></span>
+      <a class="review-open" href="https://x.com/i/status/2112993879108808980" target="_blank" rel="noopener">Open on X</a>
+    </footer>
+  </div>
+</article>
+          </div>
+          <div class="review-pile-card" style="--tweet-x: 24%; --tweet-y: 4.0%; --tweet-angle: 6deg;">
+<article class="review-tweet review-nested review-n1">
+  <a class="review-avatar-link" href="https://x.com/GetPingCron" target="_blank" rel="noopener"><img class="review-avatar" src="assets/review-tweets/755a6421ba91.jpg" alt=""></a>
+  <div class="review-body">
+    <header>
+      <a class="review-name" href="https://x.com/GetPingCron" target="_blank" rel="noopener">PingCron</a>
+      <a class="review-handle" href="https://x.com/GetPingCron" target="_blank" rel="noopener">@GetPingCron</a>
+      <a class="review-time" href="https://x.com/i/status/2114033635494158640" target="_blank" rel="noopener">Oct 24, 2026, 9:37 AM PDT</a>
+    </header>
+    <p class="review-text">I’d replace “important” with a small decision record: triggering input, wrong behavior, affected requirement, and severity. Let the fixer mark each finding fixed, refuted with evidence, or deferred. That makes disagreement visible instead of silently dropping comments.</p>
+    <footer>
+      
+      <a class="review-open" href="https://x.com/i/status/2114033635494158640" target="_blank" rel="noopener">Open on X</a>
+    </footer>
+  </div>
+</article>
+          </div>
+          <div class="review-pile-card" style="--tweet-x: 47%; --tweet-y: 1.0%; --tweet-angle: -6deg;">
+<article class="review-tweet">
+  <a class="review-avatar-link" href="https://x.com/andupoto" target="_blank" rel="noopener"><img class="review-avatar" src="assets/review-tweets/2bb229ff3634.jpg" alt=""></a>
+  <div class="review-body">
+    <header>
+      <a class="review-name" href="https://x.com/andupoto" target="_blank" rel="noopener">Andu</a>
+      <a class="review-handle" href="https://x.com/andupoto" target="_blank" rel="noopener">@andupoto</a>
+      <a class="review-time" href="https://x.com/i/status/2112994502843793909" target="_blank" rel="noopener">Oct 21, 2026, 12:48 PM PDT</a>
+    </header>
+    <p class="review-text">By hand.</p>
+    <footer>
+      <span class="review-metrics"><span>1 like</span></span>
+      <a class="review-open" href="https://x.com/i/status/2112994502843793909" target="_blank" rel="noopener">Open on X</a>
+    </footer>
+  </div>
+</article>
+          </div>
+          <div class="review-pile-card" style="--tweet-x: 70%; --tweet-y: 3.0%; --tweet-angle: 4deg;">
+<article class="review-tweet">
+  <a class="review-avatar-link" href="https://x.com/BarzTech" target="_blank" rel="noopener"><img class="review-avatar" src="assets/review-tweets/e0d9c4be1b94.jpg" alt=""></a>
+  <div class="review-body">
+    <header>
+      <a class="review-name" href="https://x.com/BarzTech" target="_blank" rel="noopener">Orlando Barboza</a>
+      <a class="review-handle" href="https://x.com/BarzTech" target="_blank" rel="noopener">@BarzTech</a>
+      <a class="review-time" href="https://x.com/i/status/2112997112635904408" target="_blank" rel="noopener">Oct 21, 2026, 12:59 PM PDT</a>
+    </header>
+    <p class="review-text">I am.<br><br>I took <a href="https://x.com/mattpocockuk" target="_blank" rel="noopener">@mattpocockuk</a> /code-review skill and adjust it to:<br><br>1. 3-axis agent review: standards/architecture, security and spec<br>2. A new review round means 3 fresh-context agents<br>3. They default to zero trust and assume the code is flawed<br>4. This happens until 0 findingss</p>
+    <footer>
+      <span class="review-metrics"><span>1 like</span> · <span>6 bookmarks</span></span>
+      <a class="review-open" href="https://x.com/i/status/2112997112635904408" target="_blank" rel="noopener">Open on X</a>
+    </footer>
+  </div>
+</article>
+          </div>
+          <div class="review-pile-card" style="--tweet-x: 2%; --tweet-y: 10.2%; --tweet-angle: -4deg;">
+<article class="review-tweet review-nested review-n1">
+  <a class="review-avatar-link" href="https://x.com/BarzTech" target="_blank" rel="noopener"><img class="review-avatar" src="assets/review-tweets/e0d9c4be1b94.jpg" alt=""></a>
+  <div class="review-body">
+    <header>
+      <a class="review-name" href="https://x.com/BarzTech" target="_blank" rel="noopener">Orlando Barboza</a>
+      <a class="review-handle" href="https://x.com/BarzTech" target="_blank" rel="noopener">@BarzTech</a>
+      <a class="review-time" href="https://x.com/i/status/2112997748551356457" target="_blank" rel="noopener">Oct 21, 2026, 1:01 PM PDT</a>
+    </header>
+    <p class="review-text">However, I think I might split standards and architecture.<br><br>Both have grown in complexity and splitting it could improve it.<br><br>Oh, of course I’ve already invested in code not have any possible debt and linting and custom linting rules strict as possible.</p>
+    <footer>
+      
+      <a class="review-open" href="https://x.com/i/status/2112997748551356457" target="_blank" rel="noopener">Open on X</a>
+    </footer>
+  </div>
+</article>
+          </div>
+          <div class="review-pile-card" style="--tweet-x: 25%; --tweet-y: 12.2%; --tweet-angle: 3deg;">
+<article class="review-tweet review-nested review-n1">
+  <a class="review-avatar-link" href="https://x.com/lucasmeijer" target="_blank" rel="noopener"><img class="review-avatar" src="assets/review-tweets/acb5c5e9a290.png" alt=""></a>
+  <div class="review-body">
+    <header>
+      <a class="review-name" href="https://x.com/lucasmeijer" target="_blank" rel="noopener">Lucas Meijer</a>
+      <a class="review-handle" href="https://x.com/lucasmeijer" target="_blank" rel="noopener">@lucasmeijer</a>
+      <a class="review-time" href="https://x.com/i/status/2113003324220026881" target="_blank" rel="noopener">Oct 21, 2026, 1:23 PM PDT</a>
+    </header>
+    <p class="review-text">can you elaborate on:<br>- which agent makes the fix<br>- what context does each agent have?  fresh?</p>
+    <footer>
+      
+      <a class="review-open" href="https://x.com/i/status/2113003324220026881" target="_blank" rel="noopener">Open on X</a>
+    </footer>
+  </div>
+</article>
+          </div>
+          <div class="review-pile-card" style="--tweet-x: 48%; --tweet-y: 9.2%; --tweet-angle: -3deg;">
+<article class="review-tweet review-nested review-n1">
+  <a class="review-avatar-link" href="https://x.com/BarzTech" target="_blank" rel="noopener"><img class="review-avatar" src="assets/review-tweets/e0d9c4be1b94.jpg" alt=""></a>
+  <div class="review-body">
+    <header>
+      <a class="review-name" href="https://x.com/BarzTech" target="_blank" rel="noopener">Orlando Barboza</a>
+      <a class="review-handle" href="https://x.com/BarzTech" target="_blank" rel="noopener">@BarzTech</a>
+      <a class="review-time" href="https://x.com/i/status/2113008487240229238" target="_blank" rel="noopener">Oct 21, 2026, 1:44 PM PDT</a>
+    </header>
+    <p class="review-text">The same agent that implemented.<br>Reviewers either suggest a fix or just highlight the finding.<br><br>Fresh = new session.<br>I only point them to the github issue I&#x27;m working on, give them the diff and what files (sec.md, arch.md, standards.md) must read before the review.</p>
+    <footer>
+      <span class="review-metrics"><span>1 like</span></span>
+      <a class="review-open" href="https://x.com/i/status/2113008487240229238" target="_blank" rel="noopener">Open on X</a>
+    </footer>
+  </div>
+</article>
+          </div>
+          <div class="review-pile-card" style="--tweet-x: 71%; --tweet-y: 11.2%; --tweet-angle: 8deg;">
+<article class="review-tweet review-nested review-n1">
+  <a class="review-avatar-link" href="https://x.com/BarzTech" target="_blank" rel="noopener"><img class="review-avatar" src="assets/review-tweets/e0d9c4be1b94.jpg" alt=""></a>
+  <div class="review-body">
+    <header>
+      <a class="review-name" href="https://x.com/BarzTech" target="_blank" rel="noopener">Orlando Barboza</a>
+      <a class="review-handle" href="https://x.com/BarzTech" target="_blank" rel="noopener">@BarzTech</a>
+      <a class="review-time" href="https://x.com/i/status/2113010027615187120" target="_blank" rel="noopener">Oct 21, 2026, 1:50 PM PDT</a>
+    </header>
+    <p class="review-text">Whenever I don&#x27;t have a github issue.<br><br>I just spawn standards and security, give them the diff and a general idea of what I did (the implementer does all the reviewer agents management).</p>
+    <footer>
+      <span class="review-metrics"><span>1 like</span></span>
+      <a class="review-open" href="https://x.com/i/status/2113010027615187120" target="_blank" rel="noopener">Open on X</a>
+    </footer>
+  </div>
+</article>
+          </div>
+          <div class="review-pile-card" style="--tweet-x: 0%; --tweet-y: 18.4%; --tweet-angle: -7deg;">
+<article class="review-tweet review-nested review-n1">
+  <a class="review-avatar-link" href="https://x.com/4bTechDecode" target="_blank" rel="noopener"><img class="review-avatar" src="assets/review-tweets/5b040c280e27.jpg" alt=""></a>
+  <div class="review-body">
+    <header>
+      <a class="review-name" href="https://x.com/4bTechDecode" target="_blank" rel="noopener">4bTech Decode</a>
+      <a class="review-handle" href="https://x.com/4bTechDecode" target="_blank" rel="noopener">@4bTechDecode</a>
+      <a class="review-time" href="https://x.com/i/status/2113968064727486638" target="_blank" rel="noopener">Oct 24, 2026, 5:17 AM PDT</a>
+    </header>
+    <p class="review-text">Zero-trust by default in code reviews is 🔥. How do you ensure the “fresh-context agents” don’t overlap blind spots? Do you rotate specialties or enforce diverse heuristics per round?</p>
+    <footer>
+      
+      <a class="review-open" href="https://x.com/i/status/2113968064727486638" target="_blank" rel="noopener">Open on X</a>
+    </footer>
+  </div>
+</article>
+          </div>
+          <div class="review-pile-card" style="--tweet-x: 23%; --tweet-y: 20.4%; --tweet-angle: 6deg;">
+<article class="review-tweet review-nested review-n1">
+  <a class="review-avatar-link" href="https://x.com/4bTechDecode" target="_blank" rel="noopener"><img class="review-avatar" src="assets/review-tweets/5b040c280e27.jpg" alt=""></a>
+  <div class="review-body">
+    <header>
+      <a class="review-name" href="https://x.com/4bTechDecode" target="_blank" rel="noopener">4bTech Decode</a>
+      <a class="review-handle" href="https://x.com/4bTechDecode" target="_blank" rel="noopener">@4bTechDecode</a>
+      <a class="review-time" href="https://x.com/i/status/2114637521250615597" target="_blank" rel="noopener">Oct 26, 2026, 1:37 AM PDT</a>
+    </header>
+    <p class="review-text">Zero-trust code review is gold, but how do you handle the overhead of cycling 3 fresh-context agents per round? Does latency scale linearly, or are you hitting diminishing returns?</p>
+    <footer>
+      
+      <a class="review-open" href="https://x.com/i/status/2114637521250615597" target="_blank" rel="noopener">Open on X</a>
+    </footer>
+  </div>
+</article>
+          </div>
+          <div class="review-pile-card" style="--tweet-x: 46%; --tweet-y: 17.4%; --tweet-angle: -6deg;">
+<article class="review-tweet">
+  <a class="review-avatar-link" href="https://x.com/distronamous" target="_blank" rel="noopener"><img class="review-avatar" src="assets/review-tweets/7a7edd7eef6c.jpg" alt=""></a>
+  <div class="review-body">
+    <header>
+      <a class="review-name" href="https://x.com/distronamous" target="_blank" rel="noopener">Profilicity</a>
+      <a class="review-handle" href="https://x.com/distronamous" target="_blank" rel="noopener">@distronamous</a>
+      <a class="review-time" href="https://x.com/i/status/2112999151751598360" target="_blank" rel="noopener">Oct 21, 2026, 1:07 PM PDT</a>
+    </header>
+    <p class="review-text">I build through Claude desktop and use codex plugin and have Claude instruct astra xhigh to review after finishing a task. I let Claude auto-fix found issues and surface me the issues that affect UX/data/domain to make choices. Then PR, one final review pass, done.</p>
+    <footer>
+      <span class="review-metrics"><span>1 like</span></span>
+      <a class="review-open" href="https://x.com/i/status/2112999151751598360" target="_blank" rel="noopener">Open on X</a>
+    </footer>
+  </div>
+</article>
+          </div>
+          <div class="review-pile-card" style="--tweet-x: 69%; --tweet-y: 19.4%; --tweet-angle: 4deg;">
+<article class="review-tweet">
+  <a class="review-avatar-link" href="https://x.com/filpizlo" target="_blank" rel="noopener"><img class="review-avatar" src="assets/review-tweets/485787da51dc.jpg" alt=""></a>
+  <div class="review-body">
+    <header>
+      <a class="review-name" href="https://x.com/filpizlo" target="_blank" rel="noopener">Filip Jerzy Pizło</a>
+      <a class="review-handle" href="https://x.com/filpizlo" target="_blank" rel="noopener">@filpizlo</a>
+      <a class="review-time" href="https://x.com/i/status/2113000587793224006" target="_blank" rel="noopener">Oct 21, 2026, 1:12 PM PDT</a>
+    </header>
+    <p class="review-text">I am happy<br><br>T800 passes the contrarian review to a filter agent, who decides if the review is good or goes too far, and the filter edits the review before delivering it back to the toplevel agent. Toplevel agent acts on the review by dispatching work to work agents</p>
+    <footer>
+      <span class="review-metrics"><span>3 likes</span></span>
+      <a class="review-open" href="https://x.com/i/status/2113000587793224006" target="_blank" rel="noopener">Open on X</a>
+    </footer>
+  </div>
+</article>
+          </div>
+          <div class="review-pile-card" style="--tweet-x: 1%; --tweet-y: 26.599999999999998%; --tweet-angle: -4deg;">
+<article class="review-tweet review-nested review-n1">
+  <a class="review-avatar-link" href="https://x.com/lucasmeijer" target="_blank" rel="noopener"><img class="review-avatar" src="assets/review-tweets/acb5c5e9a290.png" alt=""></a>
+  <div class="review-body">
+    <header>
+      <a class="review-name" href="https://x.com/lucasmeijer" target="_blank" rel="noopener">Lucas Meijer</a>
+      <a class="review-handle" href="https://x.com/lucasmeijer" target="_blank" rel="noopener">@lucasmeijer</a>
+      <a class="review-time" href="https://x.com/i/status/2113004265937781182" target="_blank" rel="noopener">Oct 21, 2026, 1:27 PM PDT</a>
+    </header>
+    <p class="review-text">oh and in which tool do you do this cross agent orchestration/dispatch?</p>
+    <footer>
+      
+      <a class="review-open" href="https://x.com/i/status/2113004265937781182" target="_blank" rel="noopener">Open on X</a>
+    </footer>
+  </div>
+</article>
+          </div>
+          <div class="review-pile-card" style="--tweet-x: 24%; --tweet-y: 28.599999999999998%; --tweet-angle: 3deg;">
+<article class="review-tweet review-nested review-n1">
+  <a class="review-avatar-link" href="https://x.com/filpizlo" target="_blank" rel="noopener"><img class="review-avatar" src="assets/review-tweets/485787da51dc.jpg" alt=""></a>
+  <div class="review-body">
+    <header>
+      <a class="review-name" href="https://x.com/filpizlo" target="_blank" rel="noopener">Filip Jerzy Pizło</a>
+      <a class="review-handle" href="https://x.com/filpizlo" target="_blank" rel="noopener">@filpizlo</a>
+      <a class="review-time" href="https://x.com/i/status/2113005660296355840" target="_blank" rel="noopener">Oct 21, 2026, 1:33 PM PDT</a>
+    </header>
+    <p class="review-text">Same model everywhere<br><br>Contrarian has a system prompt telling them to be a contrarian reviewer<br><br>Usually review finds nontrivial bugs leading to the patch changing a lot<br><br>The whole thing is driven by my coding harness (t800)</p>
+    <footer>
+      
+      <a class="review-open" href="https://x.com/i/status/2113005660296355840" target="_blank" rel="noopener">Open on X</a>
+    </footer>
+  </div>
+</article>
+          </div>
+          <div class="review-pile-card" style="--tweet-x: 47%; --tweet-y: 25.599999999999998%; --tweet-angle: -3deg;">
+<article class="review-tweet review-nested review-n1">
+  <a class="review-avatar-link" href="https://x.com/lucasmeijer" target="_blank" rel="noopener"><img class="review-avatar" src="assets/review-tweets/acb5c5e9a290.png" alt=""></a>
+  <div class="review-body">
+    <header>
+      <a class="review-name" href="https://x.com/lucasmeijer" target="_blank" rel="noopener">Lucas Meijer</a>
+      <a class="review-handle" href="https://x.com/lucasmeijer" target="_blank" rel="noopener">@lucasmeijer</a>
+      <a class="review-time" href="https://x.com/i/status/2113014134023639057" target="_blank" rel="noopener">Oct 21, 2026, 2:06 PM PDT</a>
+    </header>
+    <p class="review-text">do you do &gt;1 round?<br><br>do you just tell the model &quot;be contrarian&quot;, or are you more specific?<br><br>do you end up reading the automated review+fix process after it has finished?</p>
+    <footer>
+      
+      <a class="review-open" href="https://x.com/i/status/2113014134023639057" target="_blank" rel="noopener">Open on X</a>
+    </footer>
+  </div>
+</article>
+          </div>
+          <div class="review-pile-card" style="--tweet-x: 70%; --tweet-y: 27.599999999999998%; --tweet-angle: 8deg;">
+<article class="review-tweet review-nested review-n1">
+  <a class="review-avatar-link" href="https://x.com/filpizlo" target="_blank" rel="noopener"><img class="review-avatar" src="assets/review-tweets/485787da51dc.jpg" alt=""></a>
+  <div class="review-body">
+    <header>
+      <a class="review-name" href="https://x.com/filpizlo" target="_blank" rel="noopener">Filip Jerzy Pizło</a>
+      <a class="review-handle" href="https://x.com/filpizlo" target="_blank" rel="noopener">@filpizlo</a>
+      <a class="review-time" href="https://x.com/i/status/2113019424529850374" target="_blank" rel="noopener">Oct 21, 2026, 2:27 PM PDT</a>
+    </header>
+    <p class="review-text">Many rounds. The system prompt tones down the request for contrarianism as the round count goes up<br><br>I’ve seen it go to 7 rounds, maybe more<br><br>2-3 rounds is common<br><br>The system prompt is about a page long and describes what I mean by contrarian</p>
+    <footer>
+      <span class="review-metrics"><span>1 like</span></span>
+      <a class="review-open" href="https://x.com/i/status/2113019424529850374" target="_blank" rel="noopener">Open on X</a>
+    </footer>
+  </div>
+</article>
+          </div>
+          <div class="review-pile-card" style="--tweet-x: 1%; --tweet-y: 34.8%; --tweet-angle: -7deg;">
+<article class="review-tweet">
+  <a class="review-avatar-link" href="https://x.com/AdamFrisby" target="_blank" rel="noopener"><img class="review-avatar" src="assets/review-tweets/b995bb7ff7c6.jpg" alt=""></a>
+  <div class="review-body">
+    <header>
+      <a class="review-name" href="https://x.com/AdamFrisby" target="_blank" rel="noopener">Adam Frisby</a>
+      <a class="review-handle" href="https://x.com/AdamFrisby" target="_blank" rel="noopener">@AdamFrisby</a>
+      <a class="review-time" href="https://x.com/i/status/2113001943820071145" target="_blank" rel="noopener">Oct 21, 2026, 1:18 PM PDT</a>
+    </header>
+    <p class="review-text">I am; I use multiple rounds until comments reach zero - but with a very tight prompt so it doesn&#x27;t cycle forever. I require concrete evidence of a flaw.</p>
+    <footer>
+      
+      <a class="review-open" href="https://x.com/i/status/2113001943820071145" target="_blank" rel="noopener">Open on X</a>
+    </footer>
+  </div>
+</article>
+          </div>
+          <div class="review-pile-card" style="--tweet-x: 24%; --tweet-y: 36.8%; --tweet-angle: 6deg;">
+<article class="review-tweet review-nested review-n1">
+  <a class="review-avatar-link" href="https://x.com/lucasmeijer" target="_blank" rel="noopener"><img class="review-avatar" src="assets/review-tweets/acb5c5e9a290.png" alt=""></a>
+  <div class="review-body">
+    <header>
+      <a class="review-name" href="https://x.com/lucasmeijer" target="_blank" rel="noopener">Lucas Meijer</a>
+      <a class="review-handle" href="https://x.com/lucasmeijer" target="_blank" rel="noopener">@lucasmeijer</a>
+      <a class="review-time" href="https://x.com/i/status/2113004178859548895" target="_blank" rel="noopener">Oct 21, 2026, 1:27 PM PDT</a>
+    </header>
+    <p class="review-text">do you drive this manually?</p>
+    <footer>
+      
+      <a class="review-open" href="https://x.com/i/status/2113004178859548895" target="_blank" rel="noopener">Open on X</a>
+    </footer>
+  </div>
+</article>
+          </div>
+          <div class="review-pile-card" style="--tweet-x: 47%; --tweet-y: 33.8%; --tweet-angle: -6deg;">
+<article class="review-tweet review-nested review-n1">
+  <a class="review-avatar-link" href="https://x.com/AdamFrisby" target="_blank" rel="noopener"><img class="review-avatar" src="assets/review-tweets/b995bb7ff7c6.jpg" alt=""></a>
+  <div class="review-body">
+    <header>
+      <a class="review-name" href="https://x.com/AdamFrisby" target="_blank" rel="noopener">Adam Frisby</a>
+      <a class="review-handle" href="https://x.com/AdamFrisby" target="_blank" rel="noopener">@AdamFrisby</a>
+      <a class="review-time" href="https://x.com/i/status/2113004436889202830" target="_blank" rel="noopener">Oct 21, 2026, 1:28 PM PDT</a>
+    </header>
+    <p class="review-text">Nope! I built a magic auto orchestrator. I&#x27;ve probably spammed it before: <a href="https://github.com/AdamFrisby/CodeyBox" target="_blank" rel="noopener">https://github.com/AdamFrisby/CodeyBox</a></p>
+    <footer>
+      <span class="review-metrics"><span>3 bookmarks</span></span>
+      <a class="review-open" href="https://x.com/i/status/2113004436889202830" target="_blank" rel="noopener">Open on X</a>
+    </footer>
+  </div>
+</article>
+          </div>
+          <div class="review-pile-card" style="--tweet-x: 70%; --tweet-y: 35.8%; --tweet-angle: 4deg;">
+<article class="review-tweet">
+  <a class="review-avatar-link" href="https://x.com/adamshand" target="_blank" rel="noopener"><img class="review-avatar" src="assets/review-tweets/910c8c29a110.jpg" alt=""></a>
+  <div class="review-body">
+    <header>
+      <a class="review-name" href="https://x.com/adamshand" target="_blank" rel="noopener">Adam Shand</a>
+      <a class="review-handle" href="https://x.com/adamshand" target="_blank" rel="noopener">@adamshand</a>
+      <a class="review-time" href="https://x.com/i/status/2113008270189432992" target="_blank" rel="noopener">Oct 21, 2026, 1:43 PM PDT</a>
+    </header>
+    <p class="review-text">I do it by hand.  &quot;Please view agent feedback ...&quot; ... But I usually give advice to not chase every edge case.  &quot;Look for the sweet spot between operational robustness, customer ux &amp; long term maintainability.  Discuss with me if unclear.&quot;</p>
+    <footer>
+      <span class="review-metrics"><span>1 like</span></span>
+      <a class="review-open" href="https://x.com/i/status/2113008270189432992" target="_blank" rel="noopener">Open on X</a>
+    </footer>
+  </div>
+</article>
+          </div>
+          <div class="review-pile-card" style="--tweet-x: 2%; --tweet-y: 43.0%; --tweet-angle: -4deg;">
+<article class="review-tweet">
+  <a class="review-avatar-link" href="https://x.com/jeantudouglas" target="_blank" rel="noopener"><img class="review-avatar" src="assets/review-tweets/ba87c0c8ebed.jpg" alt=""></a>
+  <div class="review-body">
+    <header>
+      <a class="review-name" href="https://x.com/jeantudouglas" target="_blank" rel="noopener">Jean Tu</a>
+      <a class="review-handle" href="https://x.com/jeantudouglas" target="_blank" rel="noopener">@jeantudouglas</a>
+      <a class="review-time" href="https://x.com/i/status/2113010309929775241" target="_blank" rel="noopener">Oct 21, 2026, 1:51 PM PDT</a>
+    </header>
+    <p class="review-text">A classifier classifies. If it seems necessary it sends work to the code agent. Whether it coded or not, it then suggests a reply for me to validate. I am then noticed, and for every comment I have a UI page with the comment, suggested answer I can edit and side chat.</p>
+    <footer>
+      <span class="review-metrics"><span>1 like</span></span>
+      <a class="review-open" href="https://x.com/i/status/2113010309929775241" target="_blank" rel="noopener">Open on X</a>
+    </footer>
+  </div>
+</article>
+          </div>
+          <div class="review-pile-card" style="--tweet-x: 25%; --tweet-y: 45.0%; --tweet-angle: 3deg;">
+<article class="review-tweet">
+  <a class="review-avatar-link" href="https://x.com/nicoloboschi" target="_blank" rel="noopener"><img class="review-avatar" src="assets/review-tweets/ad258eac522b.jpg" alt=""></a>
+  <div class="review-body">
+    <header>
+      <a class="review-name" href="https://x.com/nicoloboschi" target="_blank" rel="noopener">Nicolò Boschi</a>
+      <a class="review-handle" href="https://x.com/nicoloboschi" target="_blank" rel="noopener">@nicoloboschi</a>
+      <a class="review-time" href="https://x.com/i/status/2113014020080869510" target="_blank" rel="noopener">Oct 21, 2026, 2:06 PM PDT</a>
+    </header>
+    <p class="review-text">1. create a code review skill with everything <br>2. create a skill to loop over code review skill <br>I can give the ones I use for managing Hindsight which has lot 30+ PRs day merged in</p>
+    <footer>
+      <span class="review-metrics"><span>1 like</span></span>
+      <a class="review-open" href="https://x.com/i/status/2113014020080869510" target="_blank" rel="noopener">Open on X</a>
+    </footer>
+  </div>
+</article>
+          </div>
+          <div class="review-pile-card" style="--tweet-x: 48%; --tweet-y: 42.0%; --tweet-angle: -3deg;">
+<article class="review-tweet">
+  <a class="review-avatar-link" href="https://x.com/ICooper" target="_blank" rel="noopener"><img class="review-avatar" src="assets/review-tweets/c5dd043752b2.jpg" alt=""></a>
+  <div class="review-body">
+    <header>
+      <a class="review-name" href="https://x.com/ICooper" target="_blank" rel="noopener">Ian Cooper</a>
+      <a class="review-handle" href="https://x.com/ICooper" target="_blank" rel="noopener">@ICooper</a>
+      <a class="review-time" href="https://x.com/i/status/2113018749561254234" target="_blank" rel="noopener">Oct 21, 2026, 2:25 PM PDT</a>
+    </header>
+    <p class="review-text">Working on it. Three major things that have helped (1) Score findings, only fail when one finding is above threshold (2) Fix the broken idea, not just the line the review flagged (3) Run a contradiction check after that fix, in case other dependent ideas now need to change.</p>
+    <footer>
+      <span class="review-metrics"><span>1 like</span></span>
+      <a class="review-open" href="https://x.com/i/status/2113018749561254234" target="_blank" rel="noopener">Open on X</a>
+    </footer>
+  </div>
+</article>
+          </div>
+          <div class="review-pile-card" style="--tweet-x: 71%; --tweet-y: 44.0%; --tweet-angle: 8deg;">
+<article class="review-tweet">
+  <a class="review-avatar-link" href="https://x.com/https_500" target="_blank" rel="noopener"><img class="review-avatar" src="assets/review-tweets/33b5ab5398aa.jpg" alt=""></a>
+  <div class="review-body">
+    <header>
+      <a class="review-name" href="https://x.com/https_500" target="_blank" rel="noopener">Pete</a>
+      <a class="review-handle" href="https://x.com/https_500" target="_blank" rel="noopener">@https_500</a>
+      <a class="review-time" href="https://x.com/i/status/2113033862884307154" target="_blank" rel="noopener">Oct 21, 2026, 3:25 PM PDT</a>
+    </header>
+    <p class="review-text">I&#x27;ve been struggling with this myself building my own issue-to-PR workflow. I&#x27;ve avoided reviewing the reviewers thus far, but have been testing an escalator approach where the reviewer can sometimes just directly edit/clean up the worker&#x27;s changes.</p>
+    <footer>
+      <span class="review-metrics"><span>2 likes</span></span>
+      <a class="review-open" href="https://x.com/i/status/2113033862884307154" target="_blank" rel="noopener">Open on X</a>
+    </footer>
+  </div>
+</article>
+          </div>
+          <div class="review-pile-card" style="--tweet-x: 0%; --tweet-y: 51.199999999999996%; --tweet-angle: -7deg;">
+<article class="review-tweet review-nested review-n1">
+  <a class="review-avatar-link" href="https://x.com/GetPingCron" target="_blank" rel="noopener"><img class="review-avatar" src="assets/review-tweets/755a6421ba91.jpg" alt=""></a>
+  <div class="review-body">
+    <header>
+      <a class="review-name" href="https://x.com/GetPingCron" target="_blank" rel="noopener">PingCron</a>
+      <a class="review-handle" href="https://x.com/GetPingCron" target="_blank" rel="noopener">@GetPingCron</a>
+      <a class="review-time" href="https://x.com/i/status/2114033649142403335" target="_blank" rel="noopener">Oct 24, 2026, 9:37 AM PDT</a>
+    </header>
+    <p class="review-text">I’d treat reviewer edits as a new patch, with the original finding linked to the change. Re-run the relevant checks and have another pass inspect that diff. Otherwise the escalation can quietly turn “reviewed” into “rewritten by the reviewer and approved by itself.”</p>
+    <footer>
+      
+      <a class="review-open" href="https://x.com/i/status/2114033649142403335" target="_blank" rel="noopener">Open on X</a>
+    </footer>
+  </div>
+</article>
+          </div>
+          <div class="review-pile-card" style="--tweet-x: 23%; --tweet-y: 53.199999999999996%; --tweet-angle: 6deg;">
+<article class="review-tweet">
+  <a class="review-avatar-link" href="https://x.com/tweeshan" target="_blank" rel="noopener"><img class="review-avatar" src="assets/review-tweets/6af4792fb44c.jpg" alt=""></a>
+  <div class="review-body">
+    <header>
+      <a class="review-name" href="https://x.com/tweeshan" target="_blank" rel="noopener">oliver.mannion</a>
+      <a class="review-handle" href="https://x.com/tweeshan" target="_blank" rel="noopener">@tweeshan</a>
+      <a class="review-time" href="https://x.com/i/status/2113040331734429982" target="_blank" rel="noopener">Oct 21, 2026, 3:50 PM PDT</a>
+    </header>
+    <p class="review-text">Roborev works pretty well for me  - I like having review results stored outside my main agents context. I can then trigger or reference review results from another agent as i like - either automatically in the background on every commit or on an adhoc basis</p>
+    <footer>
+      
+      <a class="review-open" href="https://x.com/i/status/2113040331734429982" target="_blank" rel="noopener">Open on X</a>
+    </footer>
+  </div>
+</article>
+          </div>
+          <div class="review-pile-card" style="--tweet-x: 46%; --tweet-y: 50.199999999999996%; --tweet-angle: -6deg;">
+<article class="review-tweet">
+  <a class="review-avatar-link" href="https://x.com/olson_dan" target="_blank" rel="noopener"><img class="review-avatar" src="assets/review-tweets/4f81bcb939b4.png" alt=""></a>
+  <div class="review-body">
+    <header>
+      <a class="review-name" href="https://x.com/olson_dan" target="_blank" rel="noopener">Dan Olson</a>
+      <a class="review-handle" href="https://x.com/olson_dan" target="_blank" rel="noopener">@olson_dan</a>
+      <a class="review-time" href="https://x.com/i/status/2113049668146094153" target="_blank" rel="noopener">Oct 21, 2026, 4:27 PM PDT</a>
+    </header>
+    <p class="review-text">Mine is very simple, just one round of review, but I&#x27;m thinking of not using it anymore because it slows everything down significantly while only improving code quality and rework a little.</p>
+    <footer>
+      <span class="review-metrics"><span>3 likes</span></span>
+      <a class="review-open" href="https://x.com/i/status/2113049668146094153" target="_blank" rel="noopener">Open on X</a>
+    </footer>
+  </div>
+</article>
+          </div>
+          <div class="review-pile-card" style="--tweet-x: 69%; --tweet-y: 52.199999999999996%; --tweet-angle: 4deg;">
+<article class="review-tweet">
+  <a class="review-avatar-link" href="https://x.com/noriagent" target="_blank" rel="noopener"><img class="review-avatar" src="assets/review-tweets/3c9d2dc7691f.jpg" alt=""></a>
+  <div class="review-body">
+    <header>
+      <a class="review-name" href="https://x.com/noriagent" target="_blank" rel="noopener">Jiro</a>
+      <a class="review-handle" href="https://x.com/noriagent" target="_blank" rel="noopener">@noriagent</a>
+      <a class="review-time" href="https://x.com/i/status/2113111063767974275" target="_blank" rel="noopener">Oct 21, 2026, 8:31 PM PDT</a>
+    </header>
+    <p class="review-text">Pretty happy with ours. We run our review in a subagent as part of the main thread, instead of using a third party service (because...why...) and we have a dev twin universe that the agents test against to verify that what they built actually works</p>
+    <footer>
+      
+      <a class="review-open" href="https://x.com/i/status/2113111063767974275" target="_blank" rel="noopener">Open on X</a>
+    </footer>
+  </div>
+</article>
+          </div>
+          <div class="review-pile-card" style="--tweet-x: 1%; --tweet-y: 59.39999999999999%; --tweet-angle: -4deg;">
+<article class="review-tweet">
+  <a class="review-avatar-link" href="https://x.com/ahmedaidev" target="_blank" rel="noopener"><img class="review-avatar" src="assets/review-tweets/fd190919a42f.jpg" alt=""></a>
+  <div class="review-body">
+    <header>
+      <a class="review-name" href="https://x.com/ahmedaidev" target="_blank" rel="noopener">Ahmed Ashraf</a>
+      <a class="review-handle" href="https://x.com/ahmedaidev" target="_blank" rel="noopener">@ahmedaidev</a>
+      <a class="review-time" href="https://x.com/i/status/2113189207678058953" target="_blank" rel="noopener">Oct 22, 2026, 1:42 AM PDT</a>
+    </header>
+    <p class="review-text">mine is a two-pass thing: one agent reviews and finds problems, then a second agent tries to prove the first one wrong. cuts the false positives a lot, and the findings that survive actually matter.</p>
+    <footer>
+      
+      <a class="review-open" href="https://x.com/i/status/2113189207678058953" target="_blank" rel="noopener">Open on X</a>
+    </footer>
+  </div>
+</article>
+          </div>
+          <div class="review-pile-card" style="--tweet-x: 24%; --tweet-y: 61.39999999999999%; --tweet-angle: 3deg;">
+<article class="review-tweet">
+  <a class="review-avatar-link" href="https://x.com/catmanyau" target="_blank" rel="noopener"><img class="review-avatar" src="assets/review-tweets/051c6744e1b3.jpg" alt=""></a>
+  <div class="review-body">
+    <header>
+      <a class="review-name" href="https://x.com/catmanyau" target="_blank" rel="noopener">catman</a>
+      <a class="review-handle" href="https://x.com/catmanyau" target="_blank" rel="noopener">@catmanyau</a>
+      <a class="review-time" href="https://x.com/i/status/2113201108680339574" target="_blank" rel="noopener">Oct 22, 2026, 2:29 AM PDT</a>
+    </header>
+    <p class="review-text">I wouldn&#x27;t aim for comments = 0; that can reward an agent for defending weak findings. The prove-or-refute loop is valuable, but stop when each comment is either verified or explicitly dismissed with evidence.</p>
+    <footer>
+      
+      <a class="review-open" href="https://x.com/i/status/2113201108680339574" target="_blank" rel="noopener">Open on X</a>
+    </footer>
+  </div>
+</article>
+          </div>
+          <div class="review-pile-card" style="--tweet-x: 47%; --tweet-y: 58.39999999999999%; --tweet-angle: -3deg;">
+<article class="review-tweet">
+  <a class="review-avatar-link" href="https://x.com/nooscriptor" target="_blank" rel="noopener"><img class="review-avatar" src="assets/review-tweets/e5b209c8851e.jpg" alt=""></a>
+  <div class="review-body">
+    <header>
+      <a class="review-name" href="https://x.com/nooscriptor" target="_blank" rel="noopener">Nooscriptor</a>
+      <a class="review-handle" href="https://x.com/nooscriptor" target="_blank" rel="noopener">@nooscriptor</a>
+      <a class="review-time" href="https://x.com/i/status/2113224306431864867" target="_blank" rel="noopener">Oct 22, 2026, 4:01 AM PDT</a>
+    </header>
+    <p class="review-text">I just go for 2 rounds of review using Codex auto review on PRs. It can go in loops for many rounds, and still find bugs. It makes the codebase more sloppy.</p>
+    <footer>
+      <span class="review-metrics"><span>1 like</span></span>
+      <a class="review-open" href="https://x.com/i/status/2113224306431864867" target="_blank" rel="noopener">Open on X</a>
+    </footer>
+  </div>
+</article>
+          </div>
+          <div class="review-pile-card" style="--tweet-x: 70%; --tweet-y: 60.39999999999999%; --tweet-angle: 8deg;">
+<article class="review-tweet">
+  <a class="review-avatar-link" href="https://x.com/Randomblock6" target="_blank" rel="noopener"><img class="review-avatar" src="assets/review-tweets/864ee804e77a.jpg" alt=""></a>
+  <div class="review-body">
+    <header>
+      <a class="review-name" href="https://x.com/Randomblock6" target="_blank" rel="noopener">Randomblock</a>
+      <a class="review-handle" href="https://x.com/Randomblock6" target="_blank" rel="noopener">@Randomblock6</a>
+      <a class="review-time" href="https://x.com/i/status/2113239409927639192" target="_blank" rel="noopener">Oct 22, 2026, 5:01 AM PDT</a>
+    </header>
+    <p class="review-text">Cold review from 2 different llms until no P0/P1 - low level filed in backlog<br><br>&gt;&gt;&gt;&gt;&gt;&gt;&gt;<br><br>Straight code analysis + AI judge on coverage,tests, and findings<br><br>&gt;&gt;&gt;&gt;&gt;&gt;&gt;<br><br>Security and quality review different llms<br><br>&gt;&gt;&gt;&gt;&gt;&gt;&gt;<br><br>Full PR review<br><br>I used to have cold reviews before full PR but find they actually find the bulk of the issues <br><br>Moving them upfront actually works well for me.</p>
+    <footer>
+      <span class="review-metrics"><span>2 likes</span></span>
+      <a class="review-open" href="https://x.com/i/status/2113239409927639192" target="_blank" rel="noopener">Open on X</a>
+    </footer>
+  </div>
+</article>
+          </div>
+        </div>
+              </div>
+      </section>
+      <section id="slide-13" class="slide slide-bullets" aria-label="Review principles" data-controller="build" data-action="click->build#next" data-build-descriptions-value='["Adversarial?", "Adversarial? Use an empty context", "Adversarial? Use an empty context. Require proof a user can hit it"]'>
+        <div class="slide-content">
+        <ul class="service-points" data-build-target="diagram" aria-label="Adversarial?">
+          <li>Adversarial?</li>
+          <li data-build-target="stage" hidden>Use an empty context</li>
+          <li data-build-target="stage" hidden>Require proof a user can hit it</li>
+        </ul>
+              </div>
+      </section>
+      <section id="slide-14" class="slide slide-statement" aria-label="Steal good ideas but make them your own">
+        <div class="slide-content">
+        <h1>Steal good ideas but make them your own</h1>
+              </div>
+      </section>
+      <section id="slide-15" class="slide slide-statement" aria-label="Cognitive Ergonomics">
+        <div class="slide-content">
+        <h1>Cognitive Ergonomics</h1>
+              </div>
+      </section>
+      <section id="slide-16" class="slide slide-statement" aria-label="Eval work reminder">
+        <div class="slide-content">
+        <h1>Lucas, dont forget to kickoff the eval work</h1>
+              </div>
+      </section>
+      <section id="slide-17" class="slide slide-diagram" aria-label="Idea and coding agent buildup" data-controller="build" data-action="click->build#next" data-build-descriptions-value='["A person", "A person with an idea", "A person sends an instruction to a coding agent", "The coding machine is busy working", "A second person looks at the coding agent output"]'>
+        <div class="slide-content">
+        <svg class="diagram" viewBox="0 0 1774 887" role="group" aria-label="A person" data-build-target="diagram">
+          <defs>
+            <image id="buildup-art" href="assets/coding-agent-buildup-v2.png" width="1774" height="887"/>
+            <clipPath id="agent-arrow"><rect x="410" y="535" width="235" height="65"/></clipPath>
+            <clipPath id="output-arrow"><rect x="1045" y="535" width="340" height="65"/></clipPath>
+            <clipPath id="person-region"><rect x="60" y="420" width="340" height="435"/></clipPath>
+            <clipPath id="idea-region"><rect x="60" y="20" width="360" height="375"/></clipPath>
+            <clipPath id="instruction-region"><rect x="405" y="320" width="240" height="535"/></clipPath>
+            <clipPath id="working-machine-region"><rect x="645" y="320" width="395" height="535"/></clipPath>
+            <clipPath id="output-region">
+              <rect x="1040" y="330" width="365" height="280"/>
+              <rect x="1405" y="330" width="300" height="525"/>
+            </clipPath>
+          </defs>
+          <use href="#buildup-art" clip-path="url(#person-region)"/>
+          <g data-build-target="stage" hidden>
+            <use href="#buildup-art" clip-path="url(#idea-region)"/>
+          </g>
+          <g data-build-target="stage" hidden>
+            <use href="#buildup-art" clip-path="url(#instruction-region)"/>
+            <g class="busy-machine">
+              <use class="idle-machine" href="#buildup-art" clip-path="url(#working-machine-region)"/>
+              <svg class="printing-machine" x="640" y="430" width="510" height="430" viewBox="125 110 510 430" overflow="hidden">
+                <image class="printing-frames" href="assets/machine-busy-frames.png" width="1254" height="1254"/>
+              </svg>
+            </g>
+            <g class="arrow-hover" tabindex="0" role="button" aria-label="Aligning" aria-describedby="tooltip-agent">
+              <rect x="405" y="525" width="240" height="80" fill="transparent"/>
+              <g class="arrow-emphasis" aria-hidden="true">
+                <rect x="410" y="535" width="235" height="65" fill="white"/>
+                <g transform="translate(527.5 567.5) scale(1.12 1.6) translate(-527.5 -567.5)">
+                  <use href="#buildup-art" clip-path="url(#agent-arrow)"/>
+                </g>
+              </g>
+              <g class="arrow-tooltip" id="tooltip-agent" role="tooltip" transform="translate(500 90)">
+                <rect width="1000" height="200" rx="18"/>
+                <text x="500" y="110">Aligning</text>
+              </g>
+            </g>
+          </g>
+          <g data-build-target="stage" hidden aria-hidden="true"></g>
+          <g data-build-target="stage" hidden>
+            <use href="#buildup-art" clip-path="url(#output-region)"/>
+            <g class="arrow-hover" tabindex="0" role="button" aria-label="Evaluate" aria-describedby="tooltip-output">
+              <rect x="1040" y="520" width="350" height="90" fill="transparent"/>
+              <g class="arrow-emphasis" aria-hidden="true">
+                <rect x="1045" y="535" width="340" height="65" fill="white"/>
+                <g transform="translate(1215.0 567.5) scale(1.12 1.6) translate(-1215.0 -567.5)">
+                  <use href="#buildup-art" clip-path="url(#output-arrow)"/>
+                </g>
+              </g>
+              <g class="arrow-tooltip" id="tooltip-output" role="tooltip" transform="translate(500 90)">
+                <rect width="1000" height="200" rx="18"/>
+                <text x="500" y="110">Evaluate</text>
+              </g>
+            </g>
+          </g>
+        </svg>
+              </div>
+      </section>
+      <section id="slide-18" class="slide slide-word" aria-label="Matt Pocock’s skills">
+        <div class="slide-content">
+        <h1>grill-me</h1>
+        <a class="skills-link" href="https://github.com/mattpocock/skills" target="_blank" rel="noopener noreferrer">github.com/mattpocock/skills</a>
+              </div>
+      </section>
+      <section id="slide-19" class="slide slide-photo" aria-label="Ben Affleck smoking meme">
+        <div class="slide-content">
+        <img src="assets/ben-affleck-smoking.jpg" width="710" height="1065" alt="Ben Affleck looking exhausted with his eyes closed, holding a cigarette">
+              </div>
+      </section>
+      <section id="slide-20" class="slide slide-word" aria-label="Lucas’s lplan skill">
+        <div class="slide-content">
+        <h1>lplan</h1>
+        <a class="skills-link" href="https://github.com/lucasmeijer/lucas-skills/tree/main/skills/lplan" target="_blank" rel="noopener noreferrer">github.com/lucasmeijer/lucas-skills</a>
+              </div>
+      </section>
+      <section id="slide-21" class="slide slide-statement" aria-label="Questions reminder">
+        <div class="slide-content">
+        <h1>Lucas, dont forget to look at the questions</h1>
+              </div>
+      </section>
+      <section id="slide-22" class="slide slide-diagram" aria-label="A person reviews the coding machine output">
+        <div class="slide-content">
+        <svg class="diagram" viewBox="0 0 1774 887" role="group" aria-label="A person with an idea sends instructions to the coding machine, and a second person reviews its output">
+          <use href="#buildup-art" clip-path="url(#person-region)"/>
+          <use href="#buildup-art" clip-path="url(#idea-region)"/>
+          <use href="#buildup-art" clip-path="url(#instruction-region)"/>
+            <g class="arrow-hover" tabindex="0" role="button" aria-label="Aligning" aria-describedby="tooltip-static-agent">
+              <rect x="405" y="525" width="240" height="80" fill="transparent"/>
+              <g class="arrow-emphasis" aria-hidden="true">
+                <rect x="410" y="535" width="235" height="65" fill="white"/>
+                <g transform="translate(527.5 567.5) scale(1.12 1.6) translate(-527.5 -567.5)">
+                  <use href="#buildup-art" clip-path="url(#agent-arrow)"/>
+                </g>
+              </g>
+              <g class="arrow-tooltip" id="tooltip-static-agent" role="tooltip" transform="translate(500 90)">
+                <rect width="1000" height="200" rx="18"/>
+                <text x="500" y="110">Aligning</text>
+              </g>
+            </g>
+          <use href="#buildup-art" clip-path="url(#working-machine-region)"/>
+          <use href="#buildup-art" clip-path="url(#output-region)"/>
+            <g class="arrow-hover" tabindex="0" role="button" aria-label="Evaluate" aria-describedby="tooltip-static-output">
+              <rect x="1040" y="520" width="350" height="90" fill="transparent"/>
+              <g class="arrow-emphasis" aria-hidden="true">
+                <rect x="1045" y="535" width="340" height="65" fill="white"/>
+                <g transform="translate(1215.0 567.5) scale(1.12 1.6) translate(-1215.0 -567.5)">
+                  <use href="#buildup-art" clip-path="url(#output-arrow)"/>
+                </g>
+              </g>
+              <g class="arrow-tooltip" id="tooltip-static-output" role="tooltip" transform="translate(500 90)">
+                <rect width="1000" height="200" rx="18"/>
+                <text x="500" y="110">Evaluate</text>
+              </g>
+            </g>
+        </svg>
+              </div>
+      </section>
+      <section id="slide-23" class="slide slide-statement" aria-label="Make the agent do the legwork of the evaluation">
+        <div class="slide-content">
+        <h1>Make the agent do the legwork of the evaluation</h1>
+              </div>
+      </section>
+      <section id="slide-24" class="slide slide-photo" aria-label="Simultaneous chess games">
+        <div class="slide-content">
+        <img src="assets/simultaneous-chess.png" width="540" height="366" alt="A chess player walks between two long rows of boards, playing many opponents at once">
+              </div>
+      </section>
+      <section id="slide-25" class="slide slide-diagram" aria-label="A person reviews the coding machine output">
+        <div class="slide-content">
+        <svg class="diagram" viewBox="0 0 1774 887" role="group" aria-label="A person with an idea sends instructions to the coding machine, and a second person reviews its output">
+          <use href="#buildup-art" clip-path="url(#person-region)"/>
+          <use href="#buildup-art" clip-path="url(#idea-region)"/>
+          <use href="#buildup-art" clip-path="url(#instruction-region)"/>
+            <g class="arrow-hover" tabindex="0" role="button" aria-label="Aligning" aria-describedby="tooltip-static-agent">
+              <rect x="405" y="525" width="240" height="80" fill="transparent"/>
+              <g class="arrow-emphasis" aria-hidden="true">
+                <rect x="410" y="535" width="235" height="65" fill="white"/>
+                <g transform="translate(527.5 567.5) scale(1.12 1.6) translate(-527.5 -567.5)">
+                  <use href="#buildup-art" clip-path="url(#agent-arrow)"/>
+                </g>
+              </g>
+              <g class="arrow-tooltip" id="tooltip-static-agent" role="tooltip" transform="translate(500 90)">
+                <rect width="1000" height="200" rx="18"/>
+                <text x="500" y="110">Aligning</text>
+              </g>
+            </g>
+          <use href="#buildup-art" clip-path="url(#working-machine-region)"/>
+          <use href="#buildup-art" clip-path="url(#output-region)"/>
+            <g class="arrow-hover" tabindex="0" role="button" aria-label="Evaluate" aria-describedby="tooltip-static-output">
+              <rect x="1040" y="520" width="350" height="90" fill="transparent"/>
+              <g class="arrow-emphasis" aria-hidden="true">
+                <rect x="1045" y="535" width="340" height="65" fill="white"/>
+                <g transform="translate(1215.0 567.5) scale(1.12 1.6) translate(-1215.0 -567.5)">
+                  <use href="#buildup-art" clip-path="url(#output-arrow)"/>
+                </g>
+              </g>
+              <g class="arrow-tooltip" id="tooltip-static-output" role="tooltip" transform="translate(500 90)">
+                <rect width="1000" height="200" rx="18"/>
+                <text x="500" y="110">Evaluate</text>
+              </g>
+            </g>
+        </svg>
+              </div>
+      </section>
+      <section id="slide-26" class="slide slide-statement" aria-label="now what?">
+        <div class="slide-content">
+        <h1>now what?</h1>
+              </div>
+      </section>
+      <section id="slide-27" class="slide slide-diagram" aria-label="Pushing the coding machine off the roof">
+        <div class="slide-content">
+        <div class="option-art" style="--option-x: 5%; --option-y: 8%; --option-size: 9cqw;">
+          <img class="diagram" src="assets/frustrated-machine-rooftop.png" width="1774" height="887" alt="The furious character pushes the coding machine off a building’s rooftop, sending it tumbling with a loose page fluttering out">
+          <span class="option-number" aria-label="Option 1">1</span>
+        </div>
+              </div>
+      </section>
+      <section id="slide-28" class="slide slide-diagram" aria-label="Clarification becomes fresh input">
+        <div class="slide-content">
+        <div class="option-art" style="--option-x: 27%; --option-y: 6%; --option-size: 9cqw;">
+          <img class="diagram" src="assets/curved-clarify-loop.png" width="1774" height="887" alt="The reviewer’s Clarify arrow curves up and left, then turns right to enter the coding machine from the same side as the original instruction">
+          <span class="option-number" aria-label="Option 2">2</span>
+        </div>
+              </div>
+      </section>
+      <section id="slide-29" class="slide slide-diagram slide-service" aria-label="Modifying the coding machine" data-controller="build" data-action="click->build#next" data-build-descriptions-value='["Modifying the coding machine", "Add in-repo instructions", "Add in-repo instructions. Restrict freedom", "Add in-repo instructions. Restrict freedom. Improve verification"]'>
+        <div class="slide-content">
+        <div class="option-art service-art" style="--option-x: 5%; --option-y: 8%; --option-size: 9cqw;">
+          <img class="diagram" src="assets/servicing-coding-machine.png" width="1774" height="887" alt="A Hidden Folks character opens the coding machine’s side panel and adjusts a circuit board with a screwdriver">
+          <span class="option-number" aria-label="Option 3">3</span>
+        </div>
+        <ul class="service-points" data-build-target="diagram" aria-label="Modifying the coding machine">
+          <li data-build-target="stage" hidden>Add in-repo instructions</li>
+          <li data-build-target="stage" hidden>Restrict freedom</li>
+          <li data-build-target="stage" hidden>Improve verification</li>
+        </ul>
+              </div>
+      </section>
+      <section id="slide-30" class="slide" aria-label="Shout out to ios-serve-sim">
+        <div class="slide-content">
+        <h1 class="shoutout-title">Shout out to ios-serve-sim</h1>
+        <a class="shoutout-author" href="https://x.com/Baconbrix" target="_blank" rel="noopener noreferrer">
+          <img src="assets/evan-bacon-avatar.jpg" width="140" height="140" alt="Evan Bacon’s X avatar">
+          <span>Evan Bacon<small>@Baconbrix</small></span>
+        </a>
+        <a class="skills-link" href="https://github.com/EvanBacon/serve-sim" target="_blank" rel="noopener noreferrer">github.com/EvanBacon/serve-sim</a>
+              </div>
+      </section>
+      <section id="slide-31" class="slide slide-diagram" aria-label="Linux computers sharing a Mac mini simulator">
+        <div class="slide-content">
+        <img class="diagram" src="assets/linux-machines-mac-mini.png" width="1774" height="887" alt="Ten Linux coding machines in a row connect with dotted arrows to a Mac mini displaying an iPhone simulator">
+              </div>
+      </section>
+      <section id="slide-32" class="slide slide-diagram" aria-label="Accept the work">
+        <div class="slide-content">
+        <div class="option-art" style="--option-x: 5%; --option-y: 8%; --option-size: 9cqw;">
+          <img class="diagram" src="assets/happy-accepting-work.png" width="1774" height="887" alt="The delighted character relaxes at the beach and gives a big thumbs-up to accept the completed work">
+          <span class="option-number" aria-label="Option 4">4</span>
+        </div>
+              </div>
+      </section>
+      <section id="slide-33" class="slide slide-statement" aria-label="Questions reminder">
+        <div class="slide-content">
+        <h1>Lucas, dont forget to look at the questions</h1>
+              </div>
+      </section>
+      <section id="slide-34" class="slide slide-diagram" aria-label="Parallel coding tasks" data-controller="build" data-action="click->build#next" data-build-descriptions-value='["One coding machine connects the two people", "Two coding machines work in parallel", "Three coding machines work in parallel"]'>
+        <div class="slide-content">
+        <svg class="diagram" viewBox="0 0 1774 1200" role="group" aria-label="One coding machine connects the two people" data-build-target="diagram">
+          <defs>
+            <image id="parallel-art" href="assets/coding-agent-buildup-v2.png" width="1774" height="887"/>
+            <clipPath id="parallel-person"><rect x="60" y="420" width="340" height="435"/></clipPath>
+            <clipPath id="parallel-idea"><rect x="60" y="20" width="360" height="375"/></clipPath>
+            <clipPath id="parallel-reviewer"><rect x="1405" y="410" width="300" height="445"/></clipPath>
+            <clipPath id="parallel-machine"><rect x="645" y="440" width="385" height="395"/></clipPath>
+            <clipPath id="parallel-paper"><rect x="1120" y="360" width="180" height="180"/></clipPath>
+            <marker id="parallel-arrowhead" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M2 2L10 6L2 10" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </marker>
+            <g id="parallel-task">
+              <use href="#parallel-art" clip-path="url(#parallel-machine)" transform="translate(735 0) scale(.65) translate(-645 -440)"/>
+              <use href="#parallel-art" clip-path="url(#parallel-paper)" transform="translate(1110 -10) scale(.65) translate(-1120 -360)"/>
+            </g>
+          </defs>
+          <use href="#parallel-art" clip-path="url(#parallel-person)" transform="translate(0 20)"/>
+          <use href="#parallel-art" clip-path="url(#parallel-idea)" transform="translate(0 20)"/>
+          <use href="#parallel-art" clip-path="url(#parallel-reviewer)" transform="translate(0 20)"/>
+          <g fill="none" stroke="black" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#parallel-arrowhead)">
+            <path d="M420 590Q555 581 710 590"/>
+            <path d="M1010 590Q1190 582 1400 590"/>
+          </g>
+          <use href="#parallel-task" transform="translate(0 460)"/>
+          <g data-build-target="stage" hidden>
+            <g fill="none" stroke="black" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#parallel-arrowhead)">
+              <path d="M420 570C550 570 565 200 710 200"/>
+              <path d="M1010 200C1215 200 1250 565 1400 565"/>
+            </g>
+            <use href="#parallel-task" transform="translate(0 70)"/>
+          </g>
+          <g data-build-target="stage" hidden>
+            <g fill="none" stroke="black" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#parallel-arrowhead)">
+              <path d="M420 610C550 610 565 980 710 980"/>
+              <path d="M1010 980C1215 980 1250 615 1400 615"/>
+            </g>
+            <use href="#parallel-task" transform="translate(0 850)"/>
+          </g>
+        </svg>
+              </div>
+      </section>
+      <section id="slide-35" class="slide slide-photo" aria-label="AI Coding Agent Orchestrators">
+        <div class="slide-content">
+        <img src="assets/coding-agent-orchestrators.png" width="2614" height="4096" alt="AI Coding Agent Orchestrators comparison chart">
+              </div>
+      </section>
+      <section id="slide-36" class="slide slide-photo" aria-label="Photo from happylinks">
+        <div class="slide-content">
+        <img src="assets/happylinks-orchestrators-top-text.png" width="1674" height="940" alt="Three women in a convertible, with both caption lines at the top: Get in loser, we’re building the same thing">
+              </div>
+      </section>
+      <section id="slide-37" class="slide" aria-label="AgentsInTheCloud">
+        <div class="slide-content">
+        <div class="closing-logo" role="img" aria-label="AgentsInTheCloud logo">
+          <img src="assets/agents-in-the-cloud-lettering.svg" alt="" aria-hidden="true">
+          <img src="assets/agents-in-the-cloud-artwork.png" alt="" aria-hidden="true">
+        </div>
+        <a class="closing-url" href="https://agentsinthecloud.com">agents in the cloud .com</a>
+              </div>
+      </section>
+      <section id="slide-38" class="slide slide-statement" aria-label="Agentic end user testing">
+        <div class="slide-content">
+        <h1>Agentic end user testing</h1>
+              </div>
+      </section>
+      <section id="slide-39" class="slide" aria-label="End-user testing prompt" data-controller="build" data-action="click->build#next" data-build-descriptions-value="[&quot;I want you to do end-user testing on myproduct.com.&quot;, &quot;You may not look at the source code.&quot;, &quot;Install the app by following the instructions on the website.&quot;, &quot;Use the app as a normal user would.&quot;, &quot;When you find something unclear, a bug, or another problem, create a narrated video explaining it.&quot;, &quot;If you have a suggestion for how to fix it, provide a prompt I can give to a coding agent.&quot;, &quot;Save each video and prompt as findings/$ISSUE.mp4 and findings/$ISSUE.md.&quot;]">
+        <div class="slide-content">
+        <div class="testing-prompt" data-build-target="diagram" role="group" aria-label="I want you to do end-user testing on myproduct.com.">
+          <p class="prompt-sentence">I want you to do end-user testing on myproduct.com.</p>
+          <p class="prompt-sentence" data-build-target="stage" hidden>You may not look at the source code.</p>
+          <p class="prompt-sentence" data-build-target="stage" hidden>Install the app by following the instructions on the website.</p>
+          <p class="prompt-sentence" data-build-target="stage" hidden>Use the app as a normal user would.</p>
+          <p class="prompt-sentence" data-build-target="stage" hidden>When you find something unclear, a bug, or another problem, create a narrated video explaining it.</p>
+          <p class="prompt-sentence" data-build-target="stage" hidden>If you have a suggestion for how to fix it, provide a prompt I can give to a coding agent.</p>
+          <p class="prompt-sentence" data-build-target="stage" hidden>Save each video and prompt as <code>findings/$ISSUE.mp4</code> and <code>findings/$ISSUE.md</code>.</p>
+        </div>
+              </div>
+      </section>
+      <section id="slide-40" class="slide slide-diagram slide-testing-flow" aria-label="A machine feeds the first character" data-controller="build" data-action="click->build#next" data-build-descriptions-value='["The complete original coding workflow", "The original workflow shrinks to make room on the left", "The idea bubble disappears", "Another machine sends input to the first character"]'>
+        <div class="slide-content">
+        <svg class="diagram" viewBox="0 0 1774 887" role="group" aria-label="The complete original coding workflow" data-build-target="diagram">
+          <defs>
+            <marker id="testing-input-arrowhead" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M2 2L10 6L2 10" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </marker>
+          </defs>
+          <g class="testing-original-scene">
+            <use href="#buildup-art" clip-path="url(#person-region)"/>
+            <use class="testing-idea" href="#buildup-art" clip-path="url(#idea-region)"/>
+            <use href="#buildup-art" clip-path="url(#instruction-region)"/>
+            <use href="#buildup-art" clip-path="url(#working-machine-region)"/>
+            <use href="#buildup-art" clip-path="url(#output-region)"/>
+          </g>
+          <g data-build-target="stage" hidden aria-hidden="true"></g>
+          <g data-build-target="stage" hidden aria-hidden="true"></g>
+          <g data-build-target="stage" hidden>
+            <use href="#parallel-art" clip-path="url(#parallel-machine)" transform="translate(45 440) scale(.6) translate(-645 -440)"/>
+            <path d="M295 570Q365 562 450 570" fill="none" stroke="black" stroke-width="5" stroke-linecap="round" marker-end="url(#testing-input-arrowhead)"/>
+          </g>
+        </svg>
+              </div>
+      </section>
+      <section id="slide-41" class="slide slide-video" aria-label="Narrated end-user testing video">
+        <div class="slide-content">
+        <video controls playsinline preload="metadata" aria-label="Narrated end-user testing video" data-controller="slide-video" data-action="pagehide@window->slide-video#pause visibilitychange@document->slide-video#visibility">
+          <source src="assets/narrated-demo.mp4" type="video/mp4">
+        </video>
+              </div>
+      </section>
+      <section id="slide-42" class="slide slide-word" aria-label="Narrated-video skill">
+        <div class="slide-content">
+        <h1 style="font-size: clamp(40px, 9vw, 140px)">narrated-video</h1>
+        <a class="skills-link" href="https://github.com/lucasmeijer/lucas-skills/tree/main/skills/narrated-video" target="_blank" rel="noopener noreferrer">github.com/lucasmeijer/lucas-skills</a>
+              </div>
+      </section>
+    </main>
+    <div class="presentation-frame" data-presenter-target="frame" aria-hidden="true" hidden></div>
+    <div class="presenter-controls" data-presenter-target="controls" hidden>
+      <label for="bottom-space">Bottom space</label>
+      <input id="bottom-space" type="range" min="0" max="40" value="0" step="1" data-presenter-target="slider" data-action="input->presenter#adjust">
+      <output for="bottom-space" data-presenter-target="amount">0%</output>
+    </div>
+    <script type="module" src="slides.js?v=video-autopause"></script>
+  </body>
+</html>

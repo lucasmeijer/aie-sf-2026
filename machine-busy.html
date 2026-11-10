@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Busy machine — animation experiment</title>
+    <style>
+      * { box-sizing: border-box; }
+      body { margin: 0; min-height: 100svh; display: grid; place-content: center; gap: 24px; background: #101010; color: white; font-family: Arial, sans-serif; }
+      .machine { width: min(70vw, 560px); aspect-ratio: 1; background: white url('assets/machine-busy-frames.png') 0 0 / 200% 200%; animation: working 1.6s steps(1) infinite, shaking 220ms linear infinite; transform-origin: 50% 80%; }
+      p { margin: 0; text-align: center; font-size: 18px; }
+      a { color: #bbb; }
+      @keyframes working {
+        0% { background-position: 0 0; }
+        25% { background-position: 100% 0; }
+        50% { background-position: 0 100%; }
+        75% { background-position: 100% 100%; }
+      }
+      @keyframes shaking {
+        0%, 100% { transform: translate(0, 0) rotate(0); }
+        25% { transform: translate(-2px, -1px) rotate(-0.6deg); }
+        50% { transform: translate(2px, 0) rotate(0.5deg); }
+        75% { transform: translate(-1px, -1px) rotate(-0.3deg); }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="machine" role="img" aria-label="A coding machine computing, blinking its lights, and printing a page"></div>
+    <p>Busy machine · four-frame experiment</p>
+    <p><a href="/index.html#slide-9">Back to the deck</a></p>
+  </body>
+</html>
