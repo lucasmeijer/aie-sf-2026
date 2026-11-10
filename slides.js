@@ -84,13 +84,10 @@ class PresenterController extends Controller {
   adjust() {
     const space = Number(this.sliderTarget.value);
     const scale = 1 - space / 100;
-    const topCut = space / 2;
     const style = document.documentElement.style;
     style.setProperty('--presentation-scale', scale);
-    style.setProperty('--presentation-top-cut', `${topCut}%`);
-    style.setProperty('--presentation-top-shift', `${topCut * scale}svh`);
     style.setProperty('--presentation-frame-side', `${space / 2}vw`);
-    style.setProperty('--presentation-frame-bottom', `${100 - (100 - topCut) * scale}svh`);
+    style.setProperty('--presentation-frame-bottom', `${space}svh`);
     this.amountTarget.value = `${space}%`;
   }
 }
