@@ -92,6 +92,10 @@
         width: calc((100% - clamp(32px, 8vw, 128px)) / 5);
         max-width: 320px;
       }
+      .slide-service .service-points {
+        top: max(20%, calc(var(--slide-padding-y) + min(160px, (100vw - clamp(32px, 8vw, 128px)) / 10) + 24px));
+        transform: translateX(-50%);
+      }
       .service-points {
         position: absolute;
         top: 20%;
