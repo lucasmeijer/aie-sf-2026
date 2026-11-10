@@ -143,8 +143,10 @@
       .testing-prompt code { font: inherit; overflow-wrap: anywhere; }
 
       .slide-testing-flow:not([data-build-step="0"]) .testing-original-scene { transform: translate(380px, 150px) scale(0.75); }
-      .slide-testing-flow[data-build-step="2"] .testing-idea,
-      .slide-testing-flow[data-build-step="3"] .testing-idea { display: none; }
+      .slide-testing-flow:not([data-build-step="0"]):not([data-build-step="1"]) .testing-idea { display: none; }
+      .slide-testing-flow[data-build-step="4"] .testing-person,
+      .slide-testing-flow[data-build-step="4"] .testing-instruction,
+      .slide-testing-flow[data-build-step="4"] .testing-person-input { display: none; }
       .arrow-hover { cursor: default; outline: none; }
       .arrow-emphasis { display: none; pointer-events: none; }
       .arrow-hover:hover .arrow-emphasis,
@@ -1208,7 +1210,7 @@
         </div>
               </div>
       </section>
-      <section id="slide-40" class="slide slide-diagram slide-testing-flow" aria-label="A machine feeds the first character" data-controller="build" data-action="click->build#next" data-build-descriptions-value='["The complete original coding workflow", "The original workflow shrinks to make room on the left", "The idea bubble disappears", "Another machine sends input to the first character"]'>
+      <section id="slide-40" class="slide slide-diagram slide-testing-flow" aria-label="A machine feeds the first character" data-controller="build" data-action="click->build#next" data-build-descriptions-value='["The complete original coding workflow", "The original workflow shrinks to make room on the left", "The idea bubble disappears", "Another machine sends input to the first character", "The machines communicate directly without the first character"]'>
         <div class="slide-content">
         <svg class="diagram" viewBox="0 0 1774 887" role="group" aria-label="The complete original coding workflow" data-build-target="diagram">
           <defs>
@@ -1217,9 +1219,9 @@
             </marker>
           </defs>
           <g class="testing-original-scene">
-            <use href="#buildup-art" clip-path="url(#person-region)"/>
+            <use class="testing-person" href="#buildup-art" clip-path="url(#person-region)"/>
             <use class="testing-idea" href="#buildup-art" clip-path="url(#idea-region)"/>
-            <use href="#buildup-art" clip-path="url(#instruction-region)"/>
+            <use class="testing-instruction" href="#buildup-art" clip-path="url(#instruction-region)"/>
             <use href="#buildup-art" clip-path="url(#working-machine-region)"/>
             <use href="#buildup-art" clip-path="url(#output-region)"/>
           </g>
@@ -1227,7 +1229,10 @@
           <g data-build-target="stage" hidden aria-hidden="true"></g>
           <g data-build-target="stage" hidden>
             <use href="#parallel-art" clip-path="url(#parallel-machine)" transform="translate(45 440) scale(.6) translate(-645 -440)"/>
-            <path d="M295 570Q365 562 450 570" fill="none" stroke="black" stroke-width="5" stroke-linecap="round" marker-end="url(#testing-input-arrowhead)"/>
+            <path class="testing-person-input" d="M295 570Q365 562 450 570" fill="none" stroke="black" stroke-width="5" stroke-linecap="round" marker-end="url(#testing-input-arrowhead)"/>
+          </g>
+          <g data-build-target="stage" hidden>
+            <path d="M295 570Q565 562 850 570" fill="none" stroke="black" stroke-width="5" stroke-linecap="round" marker-end="url(#testing-input-arrowhead)"/>
           </g>
         </svg>
               </div>
