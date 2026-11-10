@@ -69,6 +69,10 @@
       .additions { color: #4ade80; }
       .deletions { color: #f87171; }
       .slide-statement h1 { margin: 0; max-width: 16em; font-size: clamp(40px, 7vw, 104px); font-weight: 400; line-height: 1.15; letter-spacing: -0.04em; text-align: center; text-wrap: balance; }
+      .slide-mobile { --slide-padding-y: clamp(24px, 4vw, 64px); padding-block: var(--slide-padding-y); }
+      .mobile-work { display: flex; align-items: center; justify-content: center; gap: clamp(32px, 8vw, 128px); width: 100%; max-width: 1100px; }
+      .slide-mobile h1 { max-width: 8em; font-size: clamp(40px, 6vw, 88px); text-align: left; }
+      .mobile-work img { display: block; width: min(35vw, 34.9svh); height: auto; border-radius: 18% / 9%; }
       [hidden] { display: none !important; }
       .slide-diagram { --slide-padding-y: clamp(16px, 4vw, 64px); padding: var(--slide-padding-y); }
       .diagram { width: 100%; max-width: 1600px; max-height: 85svh; background: white; }
@@ -1294,9 +1298,12 @@
           <h1>Daybreak Blue</h1>
         </div>
       </section>
-      <section id="slide-49" class="slide slide-statement" aria-label="I love working from a phone">
+      <section id="slide-49" class="slide slide-statement slide-mobile" aria-label="I love working from a phone">
         <div class="slide-content">
-          <h1>I love working from a phone</h1>
+          <div class="mobile-work">
+            <h1>I love working from a phone</h1>
+            <img src="assets/agentsinthecloud-phone.png" width="316" height="652" alt="AgentsInTheCloud running on an iPhone, showing an agent conversation and prompt composer">
+          </div>
         </div>
       </section>
       <section id="slide-50" class="slide slide-photo" aria-label="Working outdoors">
